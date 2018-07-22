@@ -47,20 +47,23 @@ def setup_luminosity_masking_layers(image, drawable):
     LLL.name = 'LLL'
 
     # Now, our mids
-    M = pdb.gimp_channel_copy(D)
+    M = pdb.gimp_channel_copy(L)
     M.name = 'M'
-    pdb.gimp_channel_combine_masks(M, L, CHANNEL_OP_INTERSECT, 0, 0)
     image.add_channel(M, -1)
+    pdb.gimp_drawable_invert(M, 1)
+    pdb.gimp_channel_combine_masks(M, D, CHANNEL_OP_INTERSECT, 0, 0)
 
-    MM = pdb.gimp_channel_copy(DD)
+    MM = pdb.gimp_channel_copy(LL)
     MM.name = 'MM'
-    pdb.gimp_channel_combine_masks(MM, LL, CHANNEL_OP_INTERSECT, 0, 0)
     image.add_channel(MM, -1)
+    pdb.gimp_drawable_invert(MM, 1)
+    pdb.gimp_channel_combine_masks(MM, DD, CHANNEL_OP_SUBTRACT, 0, 0)
 
-    MMM = pdb.gimp_channel_copy(DDD)
+    MMM = pdb.gimp_channel_copy(LLL)
     MMM.name = 'MMM'
-    pdb.gimp_channel_combine_masks(MMM, LLL, CHANNEL_OP_INTERSECT, 0, 0)
     image.add_channel(MMM, -1)
+    pdb.gimp_drawable_invert(MMM, 1)
+    pdb.gimp_channel_combine_masks(MMM, DDD, CHANNEL_OP_SUBTRACT, 0, 0)
 
     # Remove our desat layer for cleanliness
     image.remove_layer(desaturated_layer)
@@ -159,7 +162,7 @@ def setup_luminosity_masking_layers(image, drawable):
 
 
 register(
-    "luminosity_mask_setup",
+    "python-fu-setup_luminosity_masking_layers",
     "Set up channels and layers for luminosity masking.",
     "",
     "Kevin Thornton",
