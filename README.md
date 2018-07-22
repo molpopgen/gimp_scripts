@@ -12,6 +12,16 @@ cp foo.py ~/.config/GIMP/2.10/plug-ins
 
 Make sure that they are executable!
 
+Also, be sure to restart GIMP after installing any plugins.  There is no "refresh scripts" option that works for Python
+plugins.
+
+## "Hacker hints"
+
+When editing GIMP plugins, it may be preferable to have a symbolic link from your GIMP plugin folder to the source file
+in your git repo.  The reason is that testing the script requires that it be installed, and it is highly unlikely that
+your plugin folder is a repo.  Using symbolic links lets you edit/commit/stash, etc., while keeping the plugin
+installed.
+
 ## setup_luminosity_mask.py
 
 Filters -> Generic -> Luminosity mask setup
@@ -24,3 +34,8 @@ Any resizing, etc., of the image should be applied prior to running this script.
 The final result is three layer groups (darks, lights, and mid-tones).
 
 This plugin can consume a lot of RAM on big images!
+
+This script is similar in scope to one by Pat David avaiable
+[here](https://github.com/pixlsus/GIMP-Scripts/blob/master/sg-luminosity-masks.scm).  His script works via a different
+set of operations resulting in the same masks.  The major difference is that his does not group them as layer masks in
+layer groups.
