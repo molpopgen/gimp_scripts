@@ -8,6 +8,26 @@ from gimpfu import *
 pdb = gimp.pdb
 
 
+def add_layer_group(image, name, location):
+    lg = pdb.gimp_layer_group_new(image)
+    lg.name = name
+    # Not sure why this doesn't work:
+    # pdb.gimp_image_insert_layer(image, lg, 0, -1)
+    image.add_layer(lg, location)
+    return lg
+
+
+def add_layers_to_groups(image, layer, group, channels, names):
+    for channel, name in zip(channels, names):
+        layer_copy = image.active_layer
+        layer_copy = layer.copy(True)
+        layer_copy.name = name
+        pdb.gimp_image_insert_layer(image, layer_copy, group, -1)
+        pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, channel)
+        mask = layer_copy.create_mask(ADD_SELECTION_MASK)
+        layer_copy.add_mask(mask)
+
+
 def setup_luminosity_masking_layers(image, drawable):
     layer = image.active_layer
     desaturated_layer = layer.copy(True)
@@ -70,93 +90,19 @@ def setup_luminosity_masking_layers(image, drawable):
     image.active_layer = drawable
 
     # Create our layer groups
-    lights = pdb.gimp_layer_group_new(image)
-    lights.name = "Lights"
-    # Not sure why this doesn't work:
-    # pdb.gimp_image_insert_layer(image, lights, image, -1)
-    image.add_layer(lights, -1)
-
-    mids = pdb.gimp_layer_group_new(image)
-    mids.name = "Mids"
-    image.add_layer(mids, -2)
-
-    darks = pdb.gimp_layer_group_new(image)
-    darks.name = "Darks"
-    image.add_layer(darks, -3)
+    lights = add_layer_group(image, "Lights", -1)
+    mids = add_layer_group(image, "Mids", -2)
+    darks = add_layer_group(image, "Darks", -3)
 
     # Now add in our layers with the above channels
     # as layer masks
-    Llayer = image.active_layer
-    Llayer = layer.copy(True)
-    Llayer.name = "L"
-    pdb.gimp_image_insert_layer(image, Llayer, lights, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, L)
-    mask = Llayer.create_mask(ADD_SELECTION_MASK)
-    Llayer.add_mask(mask)
-
-    LLlayer = image.active_layer
-    LLlayer = layer.copy(True)
-    LLlayer.name = "LL"
-    pdb.gimp_image_insert_layer(image, LLlayer, lights, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, LL)
-    mask = LLlayer.create_mask(ADD_SELECTION_MASK)
-    LLlayer.add_mask(mask)
-
-    LLLlayer = image.active_layer
-    LLLlayer = layer.copy(True)
-    LLLlayer.name = "LLL"
-    pdb.gimp_image_insert_layer(image, LLLlayer, lights, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, LLL)
-    mask = LLLlayer.create_mask(ADD_SELECTION_MASK)
-    LLLlayer.add_mask(mask)
-
-    Dlayer = image.active_layer
-    Dlayer = layer.copy(True)
-    Dlayer.name = "D"
-    pdb.gimp_image_insert_layer(image, Dlayer, darks, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, D)
-    mask = Dlayer.create_mask(ADD_SELECTION_MASK)
-    Dlayer.add_mask(mask)
-
-    DDlayer = image.active_layer
-    DDlayer = layer.copy(True)
-    DDlayer.name = "DD"
-    pdb.gimp_image_insert_layer(image, DDlayer, darks, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, DD)
-    mask = DDlayer.create_mask(ADD_SELECTION_MASK)
-    DDlayer.add_mask(mask)
-
-    DDDlayer = image.active_layer
-    DDDlayer = layer.copy(True)
-    DDDlayer.name = "DDD"
-    pdb.gimp_image_insert_layer(image, DDDlayer, darks, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, DDD)
-    mask = DDDlayer.create_mask(ADD_SELECTION_MASK)
-    DDDlayer.add_mask(mask)
-
-    Mlayer = layer.copy(True)
-    Mlayer.name = "M"
-    pdb.gimp_image_insert_layer(image, Mlayer, mids, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, M)
-    mask = Mlayer.create_mask(ADD_SELECTION_MASK)
-    Mlayer.add_mask(mask)
-
-    MMlayer = image.active_layer
-    MMlayer = layer.copy(True)
-    MMlayer.name = "MM"
-    pdb.gimp_image_insert_layer(image, MMlayer, mids, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MM)
-    mask = MMlayer.create_mask(ADD_SELECTION_MASK)
-    MMlayer.add_mask(mask)
-
-    MMMlayer = image.active_layer
-    MMMlayer = layer.copy(True)
-    MMMlayer.name = "MMM"
-    pdb.gimp_image_insert_layer(image, MMMlayer, mids, -1)
-    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MMM)
-    mask = MMMlayer.create_mask(ADD_SELECTION_MASK)
-    MMMlayer.add_mask(mask)
-
+    add_layers_to_groups(
+        image, layer, lights, [L, LL, LLL], ['L', 'LL', 'LLL'])
+    add_layers_to_groups(
+        image, layer, darks, [D, DD, DDD], ['D', 'DD', 'DDD'])
+    add_layers_to_groups(
+        image, layer, mids, [M, MM, MMM], ['M', 'MM', 'MMM'])
+    
     # Select none for cleanliness
     pdb.gimp_selection_none(image)
 
