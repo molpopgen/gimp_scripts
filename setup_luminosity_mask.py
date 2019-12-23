@@ -33,7 +33,7 @@ def setup_luminosity_masking_layers(image, drawable):
     desaturated_layer = layer.copy(True)
     desaturated_layer.name = "Desaturated"
     image.add_layer(desaturated_layer, -1)
-    pdb.gimp_drawable_desaturate(desaturated_layer, 3)
+    pdb.gimp_drawable_desaturate(desaturated_layer, DESATURATE_LUMA)
 
     # Make a copy of the blue channel.
     # NB: it doesn't matter which channel we copy
@@ -70,20 +70,23 @@ def setup_luminosity_masking_layers(image, drawable):
     M = pdb.gimp_channel_copy(L)
     M.name = 'M'
     image.add_channel(M, -1)
-    pdb.gimp_drawable_invert(M, 1)
     pdb.gimp_channel_combine_masks(M, D, CHANNEL_OP_INTERSECT, 0, 0)
 
     MM = pdb.gimp_channel_copy(LL)
     MM.name = 'MM'
     image.add_channel(MM, -1)
-    pdb.gimp_drawable_invert(MM, 1)
-    pdb.gimp_channel_combine_masks(MM, DD, CHANNEL_OP_INTERSECT, 0, 0)
+    pdb.gimp_selection_none(image)
+    pdb.gimp_drawable_invert(MM, 0)
+    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MM)
+    pdb.gimp_channel_combine_masks(MM, DD, CHANNEL_OP_SUBTRACT, 0, 0)
 
     MMM = pdb.gimp_channel_copy(LLL)
     MMM.name = 'MMM'
     image.add_channel(MMM, -1)
-    pdb.gimp_drawable_invert(MMM, 1)
-    pdb.gimp_channel_combine_masks(MMM, DDD, CHANNEL_OP_INTERSECT, 0, 0)
+    pdb.gimp_selection_none(image)
+    pdb.gimp_drawable_invert(MMM, 0)
+    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MMM)
+    pdb.gimp_channel_combine_masks(MMM, DDD, CHANNEL_OP_SUBTRACT, 0, 0)
 
     # Remove our desat layer for cleanliness
     image.remove_layer(desaturated_layer)
