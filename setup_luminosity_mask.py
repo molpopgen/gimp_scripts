@@ -75,14 +75,18 @@ def setup_luminosity_masking_layers(image, drawable):
     MM = pdb.gimp_channel_copy(LL)
     MM.name = 'MM'
     image.add_channel(MM, -1)
-    pdb.gimp_drawable_invert(MM, 1)
-    pdb.gimp_channel_combine_masks(MM, DD, CHANNEL_OP_INTERSECT, 0, 0)
+    pdb.gimp_selection_none(image)
+    pdb.gimp_drawable_invert(MM, 0)
+    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MM)
+    pdb.gimp_channel_combine_masks(MM, DD, CHANNEL_OP_SUBTRACT, 0, 0)
 
     MMM = pdb.gimp_channel_copy(LLL)
     MMM.name = 'MMM'
     image.add_channel(MMM, -1)
-    pdb.gimp_drawable_invert(MMM, 1)
-    pdb.gimp_channel_combine_masks(MMM, DDD, CHANNEL_OP_INTERSECT, 0, 0)
+    pdb.gimp_selection_none(image)
+    pdb.gimp_drawable_invert(MMM, 0)
+    pdb.gimp_image_select_item(image, CHANNEL_OP_REPLACE, MMM)
+    pdb.gimp_channel_combine_masks(MMM, DDD, CHANNEL_OP_SUBTRACT, 0, 0)
 
     # Remove our desat layer for cleanliness
     image.remove_layer(desaturated_layer)
