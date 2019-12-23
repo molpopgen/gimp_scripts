@@ -33,7 +33,7 @@ def setup_luminosity_masking_layers(image, drawable):
     desaturated_layer = layer.copy(True)
     desaturated_layer.name = "Desaturated"
     image.add_layer(desaturated_layer, -1)
-    pdb.gimp_drawable_desaturate(desaturated_layer, 3)
+    pdb.gimp_drawable_desaturate(desaturated_layer, DESATURATE_LUMA)
 
     # Make a copy of the blue channel.
     # NB: it doesn't matter which channel we copy
