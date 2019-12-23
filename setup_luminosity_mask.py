@@ -70,7 +70,6 @@ def setup_luminosity_masking_layers(image, drawable):
     M = pdb.gimp_channel_copy(L)
     M.name = 'M'
     image.add_channel(M, -1)
-    pdb.gimp_drawable_invert(M, 1)
     pdb.gimp_channel_combine_masks(M, D, CHANNEL_OP_INTERSECT, 0, 0)
 
     MM = pdb.gimp_channel_copy(LL)
